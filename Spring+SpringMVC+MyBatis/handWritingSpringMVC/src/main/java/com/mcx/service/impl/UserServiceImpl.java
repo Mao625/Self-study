@@ -2,6 +2,7 @@ package com.mcx.service.impl;
 
 import com.mcx.pojo.User;
 import com.mcx.service.UserService;
+import com.mcx.springmvc.annotation.Service;
 
 import java.util.ArrayList;
 import java.util.List;

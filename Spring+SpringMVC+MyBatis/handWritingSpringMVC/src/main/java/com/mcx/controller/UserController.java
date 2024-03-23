@@ -2,6 +2,10 @@ package com.mcx.controller;
 
 import com.mcx.pojo.User;
 import com.mcx.service.UserService;
+import com.mcx.springmvc.annotation.Autowired;
+import com.mcx.springmvc.annotation.Controller;
+import com.mcx.springmvc.annotation.RequestMapping;
+import com.mcx.springmvc.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
