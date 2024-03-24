@@ -132,6 +132,8 @@ public class WebApplicationContext {
                     if ((field.isAnnotationPresent(Autowired.class))){
                         Autowired annotation = field.getAnnotation(Autowired.class);
                         String beanName = annotation.value();
+
+                        //如果value值为空，则按类型装配
                         if("".equals(beanName)){
                             Class<?> type = field.getType();
                             beanName = type.getSimpleName().substring(0,1).toLowerCase() + type.getSimpleName().substring(1);

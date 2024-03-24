@@ -2,6 +2,7 @@ package com.mcx.springmvc.servlet;
 
 import com.mcx.springmvc.annotation.Controller;
 import com.mcx.springmvc.annotation.RequestMapping;
+import com.mcx.springmvc.annotation.RequestParam;
 import com.mcx.springmvc.context.WebApplicationContext;
 import com.mcx.springmvc.exception.ContentException;
 import com.mcx.springmvc.handler.MyHandler;
@@ -13,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -96,21 +99,34 @@ public class DispatcherServlet extends HttpServlet {
             else {
                 Class<?>[] parameterTypes = myHandler.getMethod().getParameterTypes();
 
+
                 //定义参数数组
                 Object[] param = new Object[parameterTypes.length];
+
+                for (int i = 0;i < parameterTypes.length;i++){
+                    if(parameterTypes[i].getSimpleName().equals("HttpServletRequest")){
+                        param[i] = req;
+                    } else if (parameterTypes[i].getSimpleName().equals("HttpServletResponse")) {
+                        param[i] = resp;
+                    }
+                }
+
 
                 //获取请求中的参数集合
                 Map<String, String[]> parameterMap = req.getParameterMap();
 
                 //迭代前端页面请求的参数
                 for (Map.Entry<String,String[]> entry : parameterMap.entrySet()){
-                    //后期待优化
                     String key = entry.getKey();
-                    String name = entry.getValue()[0];
-                    param[2] = name;
+                    String value = entry.getValue()[0];
+                    int index = hasRequestParam(myHandler.getMethod(), key);
+                    if(index != -1){
+                        param[index] = value;
+                    }
+                    else {
+
+                    }
                 }
-                param[0] = req;
-                param[1] = resp;
 
                 //使用反射调用对应方法
                 myHandler.getMethod().invoke(myHandler.getController(),param);
@@ -133,5 +149,25 @@ public class DispatcherServlet extends HttpServlet {
             }
         }
         return null;
+    }
+
+    /**
+     * 判断控制层方法有没有 @RequestParam修饰的形参，如果有，并且value值与浏览器请求的参数名一致，则返回参数位置
+     * @param method
+     * @param name
+     * @return
+     */
+    public int hasRequestParam(Method method,String name){
+        Parameter[] parameters = method.getParameters();
+        for(int i =0 ;i < parameters.length;i++){
+            if (parameters[i].isAnnotationPresent(RequestParam.class)){
+                RequestParam annotation = parameters[i].getAnnotation(RequestParam.class);
+                String paramName = annotation.value();
+                if (paramName.equals(name)){
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 }
