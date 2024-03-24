@@ -99,7 +99,6 @@ public class DispatcherServlet extends HttpServlet {
             else {
                 Class<?>[] parameterTypes = myHandler.getMethod().getParameterTypes();
 
-
                 //定义参数数组
                 Object[] param = new Object[parameterTypes.length];
 
@@ -124,7 +123,13 @@ public class DispatcherServlet extends HttpServlet {
                         param[index] = value;
                     }
                     else {
-
+                        //如果没有使用@RequestParam注解绑定形参，则根据名称传递参数
+                        List<String> methodParam = getMethodParam(myHandler.getMethod());
+                        for (int i = 0; i < methodParam.size(); i++) {
+                            if(methodParam.get(i).equals(key)){
+                                param[i] = value;
+                            }
+                        }
                     }
                 }
 
@@ -169,5 +174,20 @@ public class DispatcherServlet extends HttpServlet {
             }
         }
         return -1;
+    }
+
+    /**
+     * 返回方法中的形参的名字
+     * @param method
+     * @return
+     */
+    public List<String> getMethodParam(Method method){
+        List<String> paramList = new ArrayList<>();
+        Parameter[] parameters = method.getParameters();
+        for (int i = 0; i < parameters.length; i++) {
+            paramList.add(parameters[i].getName());
+        }
+        System.out.println("paramList="+paramList);
+        return paramList;
     }
 }

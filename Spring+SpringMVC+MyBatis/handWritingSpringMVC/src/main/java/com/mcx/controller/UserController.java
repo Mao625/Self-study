@@ -20,7 +20,7 @@ public class UserController {
     UserService userService;
 
     @RequestMapping("/list")
-    public void getUsers(HttpServletRequest request, HttpServletResponse response, @RequestParam("name") String name) throws IOException {
+    public void getUsers(HttpServletRequest request, HttpServletResponse response,  String name) throws IOException {
         response.setContentType("text/html;charset = utf-8");
         List<User> users = userService.findUsers(name);
         PrintWriter out =  response.getWriter();
