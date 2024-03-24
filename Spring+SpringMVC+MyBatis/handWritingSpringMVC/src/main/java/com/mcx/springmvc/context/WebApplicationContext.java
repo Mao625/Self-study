@@ -1,6 +1,7 @@
 package com.mcx.springmvc.context;
 
 
+import com.mcx.springmvc.annotation.Autowired;
 import com.mcx.springmvc.annotation.Controller;
 import com.mcx.springmvc.annotation.Service;
 import com.mcx.springmvc.exception.ContentException;
@@ -8,6 +9,7 @@ import com.mcx.springmvc.xml.XmlParse;
 import org.dom4j.DocumentException;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class WebApplicationContext {
     List<String> classNameList = new ArrayList<String>();
 
     //保存通过反射创建的对象
-    Map<String, Object> iocMap = new ConcurrentHashMap<String, Object>();
+    public Map<String, Object> iocMap = new ConcurrentHashMap<String, Object>();
 
     public WebApplicationContext(String contextConfigLocation) {
         this.contextConfigLocation = contextConfigLocation;
@@ -50,6 +52,10 @@ public class WebApplicationContext {
         //根据得到的类利用反射创建对象，并保存到iocMap中
         getObject();
         System.out.println("类的对象为："+iocMap);
+
+
+        //针对Autowired注解修饰的属性进行 属性注入
+        excuteAutowired();
     }
 
     /**
@@ -104,6 +110,41 @@ public class WebApplicationContext {
 
                 }
 
+            }
+        }
+    }
+
+    /**
+     * 对controller层中进行属性注入
+     * @throws IllegalAccessException
+     */
+    public void excuteAutowired() throws IllegalAccessException {
+        if(iocMap.isEmpty()){
+            throw new ContentException("没有要注入的对象");
+        }
+        else {
+            for(Map.Entry<String,Object> entry : iocMap.entrySet()){
+                String key = entry.getKey();
+                Object bean = entry.getValue();
+                System.out.println("bean="+bean);
+                Field[] declaredFields = bean.getClass().getDeclaredFields();
+                for(Field field : declaredFields){
+                    if ((field.isAnnotationPresent(Autowired.class))){
+                        Autowired annotation = field.getAnnotation(Autowired.class);
+                        String beanName = annotation.value();
+                        if("".equals(beanName)){
+                            Class<?> type = field.getType();
+                            beanName = type.getSimpleName().substring(0,1).toLowerCase() + type.getSimpleName().substring(1);
+                        }
+                        //使用爆破强制获取私有属性
+                        field.setAccessible(true);
+                        //属性注入
+                        System.out.println("iocMap.get(beanName)="+iocMap.get(beanName));
+                        System.out.println("field属性注入前="+field);
+                        field.set(bean,iocMap.get(beanName));
+                        System.out.println("field属性注入后="+field);
+                    }
+                }
             }
         }
     }

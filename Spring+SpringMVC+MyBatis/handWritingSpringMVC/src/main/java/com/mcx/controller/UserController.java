@@ -14,11 +14,12 @@ import java.io.PrintWriter;
 import java.util.List;
 
 @Controller
+@RequestMapping("/user")
 public class UserController {
     @Autowired
     UserService userService;
 
-    @RequestMapping("/user")
+    @RequestMapping("/list")
     public void getUsers(HttpServletRequest request, HttpServletResponse response, @RequestParam("name") String name) throws IOException {
         response.setContentType("text/html;charset = utf-8");
         List<User> users = userService.findUsers(name);
