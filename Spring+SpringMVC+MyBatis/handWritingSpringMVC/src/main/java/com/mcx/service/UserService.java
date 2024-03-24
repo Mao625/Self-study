@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface UserService {
     List<User> findUsers(String name);
+
+    String getMessage(String name);
 }

@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.VolatileImage;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -134,7 +135,30 @@ public class DispatcherServlet extends HttpServlet {
                 }
 
                 //使用反射调用对应方法
-                myHandler.getMethod().invoke(myHandler.getController(),param);
+                Object result = myHandler.getMethod().invoke(myHandler.getController(), param);
+
+                if(result instanceof String){
+                    //跳转jsp
+                    String viewName = (String) result;
+                    //forward:/user.jsp
+                    if(viewName.contains(":")){
+                        String viewType = viewName.split(":")[0];
+                        String viewPage = viewName.split(":")[1];
+                        if(viewType.equals("forward")){
+                            //转发
+                            req.getRequestDispatcher(viewPage).forward(req,resp);
+                        }
+                        else {
+                            //重定向
+                            resp.sendRedirect(viewPage);
+                        }
+                    }
+                    // 什么都没有写，默认转发
+                    else {
+                        req.getRequestDispatcher(viewName).forward(req,resp);
+                    }
+                }
+
             }
         } catch (Exception e) {
         throw new RuntimeException(e);

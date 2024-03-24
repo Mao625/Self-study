@@ -18,4 +18,9 @@ public class UserServiceImpl implements UserService {
 
         return users;
     }
+
+    @Override
+    public String getMessage(String name) {
+        return "我是 getMessage 方法"+name;
+    }
 }

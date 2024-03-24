@@ -28,4 +28,13 @@ public class UserController {
 
 
     }
+
+    @RequestMapping("/getByName")
+    public String getUserMessage(HttpServletRequest request, HttpServletResponse response,  String name) throws IOException {
+        response.setContentType("text/html;charset = utf-8");
+        String userName = userService.getMessage(name);
+        request.setAttribute("userMessage",userName);
+        //转发到 user.jsp，调用完方法后要跳转到user.jsp
+        return "forward:/user.jsp";
+    }
 }
