@@ -1,6 +1,8 @@
 package com.mcx.springmvc.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mcx.springmvc.annotation.Controller;
+import com.mcx.springmvc.annotation.RequestBody;
 import com.mcx.springmvc.annotation.RequestMapping;
 import com.mcx.springmvc.annotation.RequestParam;
 import com.mcx.springmvc.context.WebApplicationContext;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.VolatileImage;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.TypeVariable;
@@ -156,6 +159,21 @@ public class DispatcherServlet extends HttpServlet {
                     // 什么都没有写，默认转发
                     else {
                         req.getRequestDispatcher(viewName).forward(req,resp);
+                    }
+                }
+                else {
+                    //返回的是JSON
+                    Method method = myHandler.getMethod();
+                    if(method.isAnnotationPresent(RequestBody.class)){
+                        //调用JSON转换工具，将返回值转换
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        String json = objectMapper.writeValueAsString(result);
+                        //设置编码
+                        resp.setContentType("text/html:charset=utf-8");
+                        PrintWriter writer = resp.getWriter();
+                        writer.print(result);
+                        writer.flush();
+                        writer.close();
                     }
                 }
 

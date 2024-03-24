@@ -2,10 +2,7 @@ package com.mcx.controller;
 
 import com.mcx.pojo.User;
 import com.mcx.service.UserService;
-import com.mcx.springmvc.annotation.Autowired;
-import com.mcx.springmvc.annotation.Controller;
-import com.mcx.springmvc.annotation.RequestMapping;
-import com.mcx.springmvc.annotation.RequestParam;
+import com.mcx.springmvc.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,5 +33,12 @@ public class UserController {
         request.setAttribute("userMessage",userName);
         //转发到 user.jsp，调用完方法后要跳转到user.jsp
         return "forward:/user.jsp";
+    }
+
+
+    @RequestMapping("/getAll")
+    @RequestBody
+    public List<User> getAll(HttpServletRequest request, HttpServletResponse response,  String name) throws IOException {
+        return userService.findUsers(name);
     }
 }
