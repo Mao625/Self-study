@@ -41,12 +41,12 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
+        this.doPost(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+        excuteDispacth(req,resp);
     }
 
     /**
@@ -78,5 +78,60 @@ public class DispatcherServlet extends HttpServlet {
                 }
             }
         }
+    }
+
+
+    /**
+     * 分发请求
+     * @param req
+     * @param resp
+     */
+    public void excuteDispacth(HttpServletRequest req, HttpServletResponse resp){
+        //找到handler
+        MyHandler myHandler = getController(req);
+        try{
+            if(myHandler == null){
+                resp.getWriter().print("<h1> 404 NOT FOUND </h1>");
+            }
+            else {
+                Class<?>[] parameterTypes = myHandler.getMethod().getParameterTypes();
+
+                //定义参数数组
+                Object[] param = new Object[parameterTypes.length];
+
+                //获取请求中的参数集合
+                Map<String, String[]> parameterMap = req.getParameterMap();
+
+                //迭代前端页面请求的参数
+                for (Map.Entry<String,String[]> entry : parameterMap.entrySet()){
+                    //后期待优化
+                    String key = entry.getKey();
+                    String name = entry.getValue()[0];
+                    param[2] = name;
+                }
+                param[0] = req;
+                param[1] = resp;
+
+                //使用反射调用对应方法
+                myHandler.getMethod().invoke(myHandler.getController(),param);
+            }
+        } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+    }
+    /**
+     * 根据请求的路径找到对应的controller，处理器映射器
+     * @param req
+     * @return
+     */
+    public MyHandler getController(HttpServletRequest req){
+        String requestURI = req.getRequestURI();
+        for (MyHandler myHandler : myHandlerList){
+            //如果根据请求路径找到对应的controller方法则返回
+            if(myHandler.getUrl().equals(requestURI)){
+                return myHandler;
+            }
+        }
+        return null;
     }
 }

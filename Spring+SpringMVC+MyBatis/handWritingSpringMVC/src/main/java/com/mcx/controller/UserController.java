@@ -24,7 +24,7 @@ public class UserController {
         response.setContentType("text/html;charset = utf-8");
         List<User> users = userService.findUsers(name);
         PrintWriter out =  response.getWriter();
-        out.println("springMVC控制器"+name);
+        out.println("<h1>springMVC控制器"+name+"</h1>");
 
 
     }
