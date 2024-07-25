@@ -79,28 +79,8 @@ public class User implements Serializable {
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
-
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", userName=").append(userName);
-        sb.append(", userAccount=").append(userAccount);
-        sb.append(", avatarUrl=").append(avatarUrl);
-        sb.append(", gender=").append(gender);
-        sb.append(", userPassword=").append(userPassword);
-        sb.append(", phone=").append(phone);
-        sb.append(", email=").append(email);
-        sb.append(", userStatus=").append(userStatus);
-        sb.append(", createTime=").append(createTime);
-        sb.append(", updateTime=").append(updateTime);
-        sb.append(", isDelete=").append(isDelete);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
-    }
+    /**
+     * 用户权限 0 -普通用户，1 -管理员
+     */
+    private Integer userRole;
 }

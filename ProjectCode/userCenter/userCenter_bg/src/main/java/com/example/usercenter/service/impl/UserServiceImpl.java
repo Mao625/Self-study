@@ -18,6 +18,8 @@ import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.example.usercenter.contant.UserConstant.USER_LOGIN_STATUS;
+
 /**
 * @author MCX
 * @description 针对表【user(用户表)】的数据库操作Service实现
@@ -33,8 +35,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     //设置盐，混淆密码
     private final static String SALT = "mcx";
 
-    //定义返回用户消息的建
-    private final static String USER_LOGIN_STATUS = "currentUser";
+
 
 
     /**
@@ -125,6 +126,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return null;
         }
         //3、用户脱敏
+        User safetyUser = getSafetyUser(selectOne);
+
+        //4、记录用户登录状态
+        request.getSession().setAttribute(USER_LOGIN_STATUS,safetyUser);
+
+        return safetyUser;
+    }
+
+    @Override
+    public User getSafetyUser(User selectOne) {
         User saftyUser = new User();
         saftyUser.setId(selectOne.getId());
         saftyUser.setUserName(selectOne.getUserName());
@@ -135,10 +146,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         saftyUser.setEmail(selectOne.getEmail());
         saftyUser.setUserStatus(selectOne.getUserStatus());
         saftyUser.setCreateTime(selectOne.getCreateTime());
-
-        //4、记录用户登录状态
-        request.getSession().setAttribute(USER_LOGIN_STATUS,saftyUser);
-
+        saftyUser.setUserRole(selectOne.getUserRole());
         return saftyUser;
     }
 }
